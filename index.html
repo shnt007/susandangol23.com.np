@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sparkles Preview</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+        .container {
+            height: 40rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+        .title {
+            font-size: 3rem;
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 20;
+        }
+        .title.md {
+            font-size: 7rem;
+        }
+        .title.lg {
+            font-size: 9rem;
+        }
+        .gradient {
+            position: absolute;
+            top: 0;
+            height: 2px;
+            width: 75%;
+            left: 20%;
+            background: linear-gradient(to right, transparent, indigo, transparent);
+            filter: blur(4px);
+        }
+        .core {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: transparent;
+        }
+        .radial-gradient {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            mask-image: radial-gradient(350px 200px at top, transparent 20%, white);
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allow clicks to pass through the canvas */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Susan</h1>
+        <div class="core">
+            <!-- Gradients -->
+            <div class="gradient"></div>
+            <div class="gradient" style="height: 1px; filter: none;"></div>
+            <div class="gradient" style="left: 60%; height: 5px; filter: blur(4px);"></div>
+            <div class="gradient" style="left: 60%; height: 1px; filter: none;"></div>
+            <!-- Canvas for sparkles -->
+            <canvas id="sparklesCanvas"></canvas>
+            <!-- Radial Gradient to prevent sharp edges -->
+            <div class="radial-gradient"></div>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('sparklesCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const particles = [];
+        const particleCount = 1200;
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1 + 0.4;
+                this.speedX = Math.random() * 2 - 1;
+                this.speedY = Math.random() * 2 - 1;
+                this.color = 'rgba(255, 255, 255, 0.8)';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                // Bounce off edges
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        function init() {
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            requestAnimationFrame(animate);
+        }
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        init();
+        animate();
+    </script>
+</body>
+</html>
